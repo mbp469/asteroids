@@ -1,10 +1,27 @@
 (function gameSetup() {
     'use strict';
 
+    /* creates link to the ship ID element in the HTML */
     var shipElem = document.getElementById('ship');
-
+    /* determines how many numbers to change when key is hit.
+        this number is fed into the move object for processing. */
+    var incrementVelocity = 0.5;
+    var incrementAngle = 3;
+    //console.log(ship.HtmlObject);
+    var ship = {
+      HtmlObject: shipElem.style, /* HtmlObject is the object where we change to CSS-friendly values. */
+      velocity: 0,
+      angle: 0,
+      positionX: 0,
+      positionY: 0
+    }
     // Create your "ship" object and any other variables you might need...
+    // getShipMovement(100, 100);
+    console.log("Ship: " + ship);
 
+    // var shipStyles = document.getElementById("ship");
+    // console.log("shipStyles:\n" + shipStyles);
+    // shipStyles.setAttribute("style", "top: 300px; right: 300px");
 
     var allAsteroids = [];
     shipElem.addEventListener('asteroidDetected', function (event) {
@@ -30,6 +47,40 @@
     function handleKeys(event) {
         console.log(event.keyCode);
 
+        /* match event.keyCode to a change within the ship object */
+        switch (event.keyCode) {
+          case 37:
+            ship.angle -= incrementAngle;
+            ship.HtmlObject.transform="rotate(" + (ship.angle - incrementAngle) +  "deg)";
+            console.log("ship.angle: " + ship.angle);
+            break;
+          case 38:
+            ship.velocity += incrementVelocity;
+            ship.HtmlObject.transform="rotate(" + (ship.angle - incrementAngle) + "deg)";
+            console.log("ship.velocity: " + ship.velocity);
+            break;
+          case 39:
+            ship.angle += incrementAngle;
+            console.log("ship.angle: " + ship.angle);
+            ship.HtmlObject.transform="rotate(" + (ship.angle +  incrementAngle) + "deg)";
+            break;
+          case 40:
+          /* make sure velocity doesn't go below 0 */
+            if (ship.velocity - incrementVelocity <= 0) {
+              ship.velocity = 0;
+            } else {
+            /* if not negative, go ahead and adjust velocity down */
+            ship.velocity -= incrementVelocity;
+            console.log("ship.velocity: " + ship.velocity);
+            ship.HtmlObject.transform="rotate(" + (ship.angle + incrementAngle) + "deg)";
+            break;
+            }
+          default:
+          console.log("ship.HtmlObject.top: " + ship.HtmlObject.top);
+          console.log("ship.HtmlObject.left: " + ship.HtmlObject.left);
+            break;
+        }
+
         // Implement me!
 
     }
@@ -48,11 +99,21 @@
         // NOTE: you will need to change these arguments to match your ship object!
         // What does this function return? What will be in the `move` variable?
         // Read the documentation!
-        var move = getShipMovement(shipsCurrentVelocity, shipsCurrentAngle);
-
+        var move = getShipMovement(ship.velocity, ship.angle);
+          /* change the positionX in the ship by processing through
+            the function in the move object. Add to original positionX value. */
+          ship.positionX += move.left;
+          /* change the positionY in the ship by processing through
+            the function in the move object. Add to original position value. */
+          ship.positionY += move.top;
+          /* concatinate newly calclulated positionX to make CSS-friendly.
+              add to the left value in the ship object. */
+          ship.HtmlObject.left = (ship.positionX + "px");
+        /* concatinate newly calculated positionY to make CSS-friendly.
+            add to the top value in the ship object. */
+          ship.HtmlObject.top = (ship.positionY + "px");
 
         // Move the ship here!
-
 
         // Time to check for any collisions (see below)...
         checkForCollisions();
