@@ -4,16 +4,13 @@
     var shipElem = document.getElementById('ship');
     /* determines how many numbers to change when key is hit.
         this number is fed into the move object for processing. */
-    var incrementVelocity = 0.5;
-    var incrementAngle = 10;
+    var incrementVelocity = 0.75;
+    var incrementAngle = 15;
     /* make variable to access <main> in the HTML */
     var main = document.querySelector('main');
     /* get width and height of screen */
     var screenWidth = document.documentElement.clientWidth;
     var screenHeight = document.documentElement.clientHeight;
-
-
-    //console.log(ship.HtmlObject);
     var ship = {
       HtmlObject: shipElem.style, /* HtmlObject is the object where we change to CSS-friendly values. */
       velocity: 0,
@@ -29,11 +26,10 @@
         // The new asteroid's HTML element will be in:  event.detail
         allAsteroids.push(event.detail);
     });
-
     /**
      * Use this function to handle when a key is pressed. Which key? Use the
      * event.keyCode property to know:
-     *
+     * 13 = enter
      * 37 = left
      * 38 = up
      * 39 = right
@@ -44,11 +40,11 @@
      */
     function handleKeys(event) {
         console.log(event.keyCode);
-
         /* match event.keyCode to a change within the ship object */
         switch (event.keyCode) {
           case 13:
-            gameSetup();
+            location.reload(true);
+            break;
           case 37:
             ship.angle -= incrementAngle;
             ship.HtmlObject.transform="rotate(" + (ship.angle - incrementAngle) +  "deg)";
@@ -117,14 +113,13 @@
             ship.positionY = screenHeight;
           }
         }
-          /* concatinate newly calclulated positionX to make CSS-friendly.
-              add to the left value in the ship object. */
-          ship.HtmlObject.left = (ship.positionX + "px");
-        /* concatinate newly calculated positionY to make CSS-friendly.
-            add to the top value in the ship object. */
-          ship.HtmlObject.top = (ship.positionY + "px");
-
         applyPosition();
+        /* concatinate newly calclulated positionX to make CSS-friendly.
+            add to the left value in the ship object. */
+        ship.HtmlObject.left = (ship.positionX + "px");
+      /* concatinate newly calculated positionY to make CSS-friendly.
+          add to the top value in the ship object. */
+        ship.HtmlObject.top = (ship.positionY + "px");
         checkForCollisions();
     }
     /**
@@ -153,7 +148,6 @@
           var shipBBBottom = shipElem.getBoundingClientRect().bottom;
           var shipBBRight = shipElem.getBoundingClientRect().right;
           var shipBBLeft = shipElem.getBoundingClientRect().left;
-
           /* check to see if bounding boxes overlap top to bottom */
           if ((shipBBTop >= asteroidBBTop && shipBBTop <= asteroidBBBottom)
               || (shipBBTop >= asteroidBBTop && shipBBTop <= asteroidBBBottom)) {
@@ -162,12 +156,9 @@
               || (shipBBLeft <= asteroidBBLeft && shipBBRight >= asteroidBBLeft)) {
                 crash(allAsteroids[i]);
               }
-
           }
         }
     }
-
-
     /**
      * This event handler will execute when a crash occurs
      *
@@ -185,15 +176,15 @@
         lStyle.textAlign="center";
         lStyle.fontSize="9em";
         lStyle.opacity="0.9";
-        lStyle.backgroundColor="orange";
+        lStyle.backgroundImage="radial-gradient(circle, yellow, orange, indigo)";
         lStyle.color="red";
-        lStyle.textShadow="3px 3px 2px yellow";
+        lStyle.textShadow="3px 3px 2px navy";
+        lStyle.padding="8% 2% 2% 1%";
         lose.innerHTML="You Crashed! <br> Press 'Enter' to try again.";
         main.appendChild(lose);
+        /* restart the event listener for keys */
+        document.querySelector('body').addEventListener('keyup', handleKeys);
     });
-
-
-
     /** ************************************************************************
      *             These functions and code are given to you.
      *
