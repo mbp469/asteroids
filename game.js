@@ -1,12 +1,12 @@
 (function gameSetup() {
     'use strict';
-
+    var crashes = 0;
     /* creates link to the ship ID element in the HTML */
     var shipElem = document.getElementById('ship');
     /* determines how many numbers to change when key is hit.
         this number is fed into the move object for processing. */
-    var incrementVelocity = 0.2;
-    var incrementAngle = 8;
+    var incrementVelocity = 0.5;
+    var incrementAngle = 10;
     //console.log(ship.HtmlObject);
     var ship = {
       HtmlObject: shipElem.style, /* HtmlObject is the object where we change to CSS-friendly values. */
@@ -15,22 +15,13 @@
       positionX: 300,
       positionY: 300
     }
-    // Create your "ship" object and any other variables you might need...
-    // getShipMovement(100, 100);
     console.log("Ship: " + ship);
-
-    // var shipStyles = document.getElementById("ship");
-    // console.log("shipStyles:\n" + shipStyles);
-    // shipStyles.setAttribute("style", "top: 300px; right: 300px");
 
     var allAsteroids = [];
     shipElem.addEventListener('asteroidDetected', function (event) {
         // You can detect when a new asteroid appears with this event.
         // The new asteroid's HTML element will be in:  event.detail
         allAsteroids.push(event.detail);
-        // What might you need/want to do in here?
-        // console.log(allAsteroids);
-        // console.log(event.detail.getBoundingClientRect().top);
     });
 
     /**
@@ -79,9 +70,6 @@
           console.log("ship.HtmlObject.left: " + ship.HtmlObject.left);
             break;
         }
-
-        // Implement me!
-
     }
     document.querySelector('body').addEventListener('keyup', handleKeys);
 
@@ -101,25 +89,39 @@
         var move = getShipMovement(ship.velocity, ship.angle);
 
         function applyPosition() {
+          /* get width and height of screen */
+          var screenWidth = document.documentElement.clientWidth;
+          var screenHeight = document.documentElement.clientHeight;
           /* change the positionX in the ship by processing through
             the function in the move object. Add to original positionX value. */
           ship.positionX += move.left;
           /* change the positionY in the ship by processing through
             the function in the move object. Add to original position value. */
           ship.positionY -= move.top;
+          /* Readjust positions X and Y if past edge of screen. */
+          if(ship.positionX < 0) {
+            ship.positionX = screenWidth;
+          }
+          if(ship.positionX > screenWidth) {
+            ship.positionX = 0;
+          }
+          if(ship.positionY > screenHeight) {
+            ship.positionY = 0;
+          }
+          if(ship.positionY < 0) {
+            ship.positionY = screenHeight;
+          }
+        }
           /* concatinate newly calclulated positionX to make CSS-friendly.
               add to the left value in the ship object. */
           ship.HtmlObject.left = (ship.positionX + "px");
         /* concatinate newly calculated positionY to make CSS-friendly.
             add to the top value in the ship object. */
           ship.HtmlObject.top = (ship.positionY + "px");
-        }
 
         applyPosition();
-        // Time to check for any collisions (see below)...
         checkForCollisions();
     }
-
     /**
      * This function checks for any collisions between asteroids and the ship.
      * If a collision is detected, the crash method should be called with the
@@ -135,16 +137,13 @@
      * @return void
      */
     function checkForCollisions() {
-        // var shipBB = ship.HtmlObject.getBoundingClientRect();
         for(var i = 0; i < allAsteroids.length; i++) {
-          // console.log(allAsteroids[i]);
           var asteroidArrayObject = allAsteroids[i];
-
+          /* get values from the bounding boxes to compare with each other */
           var asteroidBBTop = asteroidArrayObject.getBoundingClientRect().top;
           var asteroidBBBottom = asteroidArrayObject.getBoundingClientRect().bottom;
           var asteroidBBLeft = asteroidArrayObject.getBoundingClientRect().left;
           var asteroidBBRight = asteroidArrayObject.getBoundingClientRect().right;
-          console.log(shipElem);
           var shipBBTop = shipElem.getBoundingClientRect().top;
           var shipBBBottom = shipElem.getBoundingClientRect().bottom;
           var shipBBRight = shipElem.getBoundingClientRect().right;
@@ -158,6 +157,7 @@
               || (shipBBLeft <= asteroidBBLeft && shipBBRight >= asteroidBBLeft)) {
                 crash(allAsteroids[i]);
               }
+
           }
         }
     }
@@ -170,7 +170,9 @@
      */
     document.querySelector('main').addEventListener('crash', function () {
         console.log('A crash occurred!');
-
+        ship.HtmlObject.transition="all 5s ease-out";
+        ship.HtmlObject.opacity="0";
+        crashes ++;
         // What might you need/want to do in here?
 
     });
@@ -216,5 +218,4 @@
             top: (velocity * Math.cos(angle * Math.PI / 180))
         };
     }
-
-})();
+    })();
