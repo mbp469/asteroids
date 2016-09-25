@@ -1,12 +1,18 @@
 (function gameSetup() {
     'use strict';
-    var crashes = 0;
     /* creates link to the ship ID element in the HTML */
     var shipElem = document.getElementById('ship');
     /* determines how many numbers to change when key is hit.
         this number is fed into the move object for processing. */
     var incrementVelocity = 0.5;
     var incrementAngle = 10;
+    /* make variable to access <main> in the HTML */
+    var main = document.querySelector('main');
+    /* get width and height of screen */
+    var screenWidth = document.documentElement.clientWidth;
+    var screenHeight = document.documentElement.clientHeight;
+
+
     //console.log(ship.HtmlObject);
     var ship = {
       HtmlObject: shipElem.style, /* HtmlObject is the object where we change to CSS-friendly values. */
@@ -41,6 +47,8 @@
 
         /* match event.keyCode to a change within the ship object */
         switch (event.keyCode) {
+          case 13:
+            gameSetup();
           case 37:
             ship.angle -= incrementAngle;
             ship.HtmlObject.transform="rotate(" + (ship.angle - incrementAngle) +  "deg)";
@@ -89,9 +97,6 @@
         var move = getShipMovement(ship.velocity, ship.angle);
 
         function applyPosition() {
-          /* get width and height of screen */
-          var screenWidth = document.documentElement.clientWidth;
-          var screenHeight = document.documentElement.clientHeight;
           /* change the positionX in the ship by processing through
             the function in the move object. Add to original positionX value. */
           ship.positionX += move.left;
@@ -172,9 +177,19 @@
         console.log('A crash occurred!');
         ship.HtmlObject.transition="all 5s ease-out";
         ship.HtmlObject.opacity="0";
-        crashes ++;
         // What might you need/want to do in here?
-
+        var lose = document.createElement("div");
+        var lStyle = lose.style;
+        lStyle.width=screenWidth + "px";
+        lStyle.height=screenHeight + "px";
+        lStyle.textAlign="center";
+        lStyle.fontSize="9em";
+        lStyle.opacity="0.9";
+        lStyle.backgroundColor="orange";
+        lStyle.color="red";
+        lStyle.textShadow="3px 3px 2px yellow";
+        lose.innerHTML="You Crashed! <br> Press 'Enter' to try again.";
+        main.appendChild(lose);
     });
 
 
